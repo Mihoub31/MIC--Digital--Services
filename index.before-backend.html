@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MIC Digital Services</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}
+header{background:#101c35;color:white;padding:24px 7%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.logo{font-size:25px;font-weight:bold;color:#42d6c5}
+nav button, .lang button{padding:9px 13px;border:0;border-radius:7px;cursor:pointer;margin:3px}
+.lang button{background:#263958;color:white}
+.hero{text-align:center;padding:75px 20px;background:linear-gradient(135deg,#12213d,#174d67);color:white}
+.hero h1{font-size:38px;margin:0 0 18px}
+.hero p{font-size:19px;line-height:1.8}
+.btn{display:inline-block;background:#12b89e;color:white;text-decoration:none;padding:13px 22px;border-radius:8px;font-weight:bold;margin:10px}
+section{padding:45px 7%;text-align:center}
+h2{font-size:28px;color:#142c4b}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:25px}
+.card{background:white;padding:25px;border-radius:13px;box-shadow:0 4px 18px #10204012}
+.card h3{color:#087e83}
+.card p{line-height:1.8;color:#596579}
+.price{font-weight:bold;color:#087e83}
+.contact{background:#e8f4f5}
+footer{background:#101c35;color:white;text-align:center;padding:22px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MIC Digital Services</div>
+  <div class="lang">
+    <button onclick="setLang('ar')">العربية</button>
+    <button onclick="setLang('fr')">Français</button>
+    <button onclick="setLang('en')">English</button>
+  </div>
+</header>
+
+<div class="hero">
+  <h1 id="title">حلول رقمية لتطوير أعمالك</h1>
+  
+</section>
+
+
+<section id="services">
+  <h2 id="servicesTitle">خدماتنا الرقمية</h2>
+  <div class="cards">
+
+    <div class="card">
+      <h3 id="s1">إنشاء المواقع الإلكترونية</h3>
+      <p id="d1">مواقع احترافية ومتجاوبة مع الهاتف والكمبيوتر لنشاطك التجاري.</p>
+      <div class="price" id="p1">ابتداءً من 8,000 دج</div>
+    </div>
+
+    <div class="card">
+      <h3 id="s2">الكتالوج الإلكتروني</h3>
+      <p id="d2">عرض منتجاتك وخدماتك بطريقة منظمة وسهلة للزبائن.</p>
+      <div class="price" id="p2">ابتداءً من 5,000 دج</div>
+    </div>
+
+    <div class="card">
+      <h3 id="s3">ملفات الأعمال</h3>
+      <p id="d3">إعداد ملفات Word وExcel وعروض الأسعار والفواتير.</p>
+      <div class="price" id="p3">حسب الطلب</div>
+    </div>
+
+    <div class="card">
+      <h3 id="s4">الصيانة والتحديث</h3>
+      <p id="d4">متابعة موقعك وتحديث المعلومات والخدمات عند الحاجة.</p>
+      <div class="price" id="p4">ابتداءً من 3,000 دج شهرياً</div>
+    </div>
+
+    <div class="card">
+      <h3 id="s5">إنشاء التطبيقات</h3>
+      <p id="d5">تطوير تطبيقات الهاتف Android وiPhone حسب احتياجات مشروعك.</p>
+      <div class="price" id="p5">حسب الطلب</div>
+    </div>
+
+    <div class="card">
+      <h3 id="s6">منصات المستشفيات والشركات</h3>
+      <p id="d6">إنشاء منصات رقمية لإدارة المؤسسات والمستشفيات والعيادات والشركات حسب طبيعة نشاطها.</p>
+      <div class="price" id="p6">حسب حجم المشروع</div>
+    </div>
+
+
+
+
+
+  </div>
+</section>
+
+<section class="contact">
+  <h2 id="contactTitle">هل تريد تطوير نشاطك التجاري؟</h2>
+  <p id="contactText">اتصل بنا الآن لمناقشة مشروعك والحصول على عرض مناسب.</p>
+  <a class="btn wa" href="#" target="_blank" id="contactBtn">راسلنا عبر WhatsApp</a>
+
+
+
+</section>
+
+<footer>
+  © 2026 MIC Digital Services
+</footer>
+
+<script>
+// ضع رقم WhatsApp الخاص بك هنا: 213 ثم الرقم دون الصفر الأول
+const WHATSAPP_NUMBER = "213771626233";
+
+const messages = {
+ ar:{
+  title:"حلول رقمية لتطوير أعمالك",
+  intro:"نساعد المحلات والمؤسسات الجزائرية على تطوير حضورها الرقمي.",
+  heroBtn:"تواصل معنا عبر WhatsApp",
+  servicesTitle:"خدماتنا الرقمية",
+  s1:"إنشاء المواقع الإلكترونية",d1:"مواقع احترافية ومتجاوبة مع الهاتف والكمبيوتر لنشاطك التجاري.",p1:"ابتداءً من 8,000 دج",
+  s2:"كتالوج إلكتروني",d2:"عرض منتجاتك وخدماتك بطريقة منظمة وسهلة للزبائن.",p2:"ابتداءً من 5,000 دج",
+  s3:"ملفات الأعمال",d3:"إعداد ملفات Word وExcel وعروض الأسعار والفواتير.",p3:"حسب الطلب",
+  s4:"الصيانة والتحديث",d4:"متابعة موقعك وتحديث المعلومات والخدمات عند الحاجة.",p4:"ابتداءً من 3,000 دج شهرياً",
+  s5:"إنشاء التطبيقات",d5:"تطوير تطبيقات Android وiPhone حسب احتياجات مشروعك.",p5:"حسب الطلب",
+  s6:"منصات المستشفيات والشركات",d6:"منصات رقمية لإدارة المستشفيات والعيادات والشركات والمؤسسات.",p6:"حسب حجم المشروع",
+  contactTitle:"هل تريد تطوير نشاطك التجاري؟",
+  contactText:"اتصل بنا الآن لمناقشة مشروعك والحصول على عرض مناسب.",
+  contactBtn:"راسلنا عبر WhatsApp"
+ },
+ fr:{
+  title:"Des solutions numériques pour votre entreprise",
+  intro:"Nous aidons les commerces et entreprises algériens à développer leur présence numérique.",
+  heroBtn:"Contactez-nous sur WhatsApp",
+  servicesTitle:"Nos services numériques",
+  s1:"Création de sites web",d1:"Des sites professionnels adaptés aux téléphones et ordinateurs.",p1:"À partir de 8 000 DA",
+  s2:"Catalogue électronique",d2:"Présentez vos produits et services à vos clients.",p2:"À partir de 5 000 DA",
+  s3:"Documents professionnels",d3:"Création de documents Word, Excel, devis et factures.",p3:"Sur demande",
+  s4:"Maintenance et mise à jour",d4:"Suivi et actualisation de votre site web.",p4:"À partir de 3 000 DA/mois",
+  s5:"Création d'applications",d5:"Développement d'applications Android et iPhone adaptées à votre projet.",p5:"Sur demande",
+  s6:"Plateformes pour hôpitaux et entreprises",d6:"Plateformes numériques pour la gestion des hôpitaux, cliniques et entreprises.",p6:"Selon le projet",
+  contactTitle:"Vous souhaitez développer votre activité ?",
+  contactText:"Contactez-nous pour discuter de votre projet.",
+  contactBtn:"Écrivez-nous sur WhatsApp"
+ },
+ en:{
+  title:"Digital solutions for your business",
+  intro:"We help Algerian shops and businesses build their digital presence.",
+  heroBtn:"Contact us on WhatsApp",
+  servicesTitle:"Our Digital Services",
+  s1:"Website creation",d1:"Professional websites for phones and computers.",p1:"Starting from 8,000 DZD",
+  s2:"Digital catalogue",d2:"Present your products and services to your customers.",p2:"Starting from 5,000 DZD",
+  s3:"Business documents",d3:"Word, Excel, quotations and invoice documents.",p3:"On request",
+  s4:"Maintenance and updates",d4:"Website maintenance and content updates.",p4:"Starting from 3,000 DZD/month",
+  s5:"App development",d5:"Android and iPhone applications tailored to your project.",p5:"On request",
+  s6:"Hospital and business platforms",d6:"Digital management platforms for hospitals, clinics and companies.",p6:"Depending on the project",
+  contactTitle:"Ready to grow your business?",
+  contactText:"Contact us to discuss your project and get an offer.",
+  contactBtn:"Message us on WhatsApp"
+ }
+};
+
+function setLang(lang){
+ const t=messages[lang];
+ document.documentElement.lang=lang;
+ document.documentElement.dir=lang==="ar"?"rtl":"ltr";
+ Object.keys(t).forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.textContent=t[id];
+ });
+}
+
+function updateWhatsApp(){
+ const number=WHATSAPP_NUMBER.replace(/\D/g,"");
+ const valid=number.length>=10 && !number.includes("X");
+ const url=valid
+  ? "https://wa.me/"+number+"?text="+encodeURIComponent("السلام عليكم، أريد الاستفسار عن خدمات MIC Digital Services.")
+  : "#";
+ document.querySelectorAll(".wa").forEach(link=>{
+  link.href=url;
+  if(!valid) link.onclick=(e)=>{
+   e.preventDefault();
+   alert("يرجى وضع رقم WhatsApp الصحيح داخل ملف index.html");
+  };
+ });
+}
+updateWhatsApp();
+</script>
+</body>
+</html>
