@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة إدارة MIC Digital Services</title>
+<style>
+:root{--bg:#f3f6fa;--panel:#fff;--nav:#102a43;--accent:#087e83;--text:#243b53;--muted:#829ab1;--border:#e5edf3}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Tahoma,sans-serif;background:var(--bg);color:var(--text)}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:var(--nav);color:white;padding:25px 16px;flex-shrink:0}
+.logo{font-size:21px;font-weight:bold;padding:10px;margin-bottom:30px}
+.logo span{color:#4fd1c5}
+.menu button{display:block;width:100%;padding:14px 16px;border:0;background:none;color:#d9e2ec;text-align:right;border-radius:8px;margin:5px 0;cursor:pointer;font-size:15px}
+.menu button:hover,.menu button.active{background:#087e83;color:white}
+.main{flex:1;min-width:0;padding:28px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:28px}
+h1{font-size:24px;margin:0}
+.subtitle{color:var(--muted);font-size:13px;margin-top:7px}
+.panel{display:none}
+.panel.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:24px}
+.card,.box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card small{color:var(--muted)}
+.number{font-size:28px;font-weight:bold;margin-top:12px;color:var(--accent)}
+.box{margin-bottom:20px}
+.box h3{margin-top:0}
+table{width:100%;border-collapse:collapse;min-width:550px}
+th,td{padding:13px 10px;text-align:right;border-bottom:1px solid var(--border);font-size:14px}
+th{color:var(--muted);background:#f8fafc}
+.table-wrap{overflow-x:auto}
+.btn{background:var(--accent);color:white;border:0;padding:11px 17px;border-radius:7px;cursor:pointer;font-size:14px}
+.btn:hover{opacity:.9}
+.btn.secondary{background:#e6fffa;color:#087e83}
+input,select,textarea{width:100%;padding:12px;border:1px solid var(--border);border-radius:7px;margin:7px 0 15px;font:inherit}
+label{font-size:14px;font-weight:bold}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actions{display:flex;gap:8px;align-items:center}
+.status{background:#e6fffa;color:#087e83;padding:5px 9px;border-radius:20px;font-size:12px}
+.empty{text-align:center;color:var(--muted);padding:25px}
+@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}.sidebar{width:190px}.main{padding:18px}}
+@media(max-width:600px){.layout{display:block}.sidebar{width:100%;padding:12px}.logo{margin-bottom:8px}.menu{display:flex;overflow-x:auto}.menu button{white-space:nowrap;width:auto}.main{padding:15px}.cards{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}h1{font-size:19px}}
+.ai-status{display:inline-block;padding:7px 12px;border-radius:20px;font-size:13px;margin-bottom:12px}
+.ai-status.online{background:#dcfce7;color:#166534}
+.ai-status.offline{background:#fee2e2;color:#991b1b}
+.ai-messages{min-height:220px;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:9px;padding:14px;margin:12px 0;background:#f8fafc}
+.ai-message{padding:11px 13px;border-radius:9px;margin:9px 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7}
+.ai-message.user{background:#dbeafe;margin-left:12%;color:#1e3a8a}
+.ai-message.assistant{background:#e2e8f0;margin-right:12%;color:#0f172a}
+.ai-form{display:flex;gap:10px;align-items:flex-start}
+.ai-form textarea{flex:1;min-height:75px;resize:vertical}
+.ai-form button{margin-top:7px;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="logo">MIC <span>Digital</span><br>Services</div>
+  <nav class="menu">
+    <button class="active" onclick="showPanel('dashboard',this)">الرئيسية</button>
+    <button onclick="showPanel('clients',this)">العملاء</button>
+    <button onclick="showPanel('requests',this)">الطلبات</button>
+    <button onclick="showPanel('projects',this)">المشاريع</button>
+  <button type="button" onclick="showAIPanel(this)">المساعد الذكي</button>
+</nav>
+</aside>
+<main class="main">
+<header class="top">
+ <div><h1 id="pageTitle">لوحة القيادة</h1><div class="subtitle">إدارة خدمات MIC Digital Services</div></div>
+ <span class="status">النظام المحلي</span>
+</header>
+
+<section id="dashboard" class="panel active">
+ <div class="cards">
+  <div class="card"><small>إجمالي العملاء</small><div class="number" id="clientCount">0</div></div>
+  <div class="card"><small>الطلبات</small><div class="number" id="requestCount">0</div></div>
+  <div class="card"><small>المشاريع</small><div class="number" id="projectCount">0</div></div>
+  <div class="card"><small>الطلبات الجديدة</small><div class="number" id="newCount">0</div></div>
+ </div>
+ <div class="box"><h3>مرحباً بك في لوحة الإدارة</h3><p>من هنا يمكنك متابعة العملاء والطلبات والمشاريع الخاصة بالوكالة.</p><p class="subtitle">البيانات تحفظ محلياً في هذا المتصفح فقط في هذه النسخة التجريبية.</p></div>
+ <div class="box"><h3>آخر الطلبات</h3><div id="recentRequests" class="empty">لا توجد طلبات بعد.</div></div>
+</section>
+
+<section id="clients" class="panel">
+ <div class="box">
+  <h3>إضافة عميل جديد</h3>
+  <form id="clientForm">
+   <div class="form-grid">
+    <div><label>اسم العميل</label><input id="clientName" required></div>
+    <div><label>رقم الهاتف</label><input id="clientPhone" required></div>
+    <div><label>النشاط التجاري</label><input id="clientBusiness"></div>
+    <div><label>البريد الإلكتروني</label><input id="clientEmail" type="email"></div>
+   </div>
+   <button class="btn">حفظ العميل</button>
+  </form>
+ </div>
+ <div class="box"><h3>قائمة العملاء</h3><div class="table-wrap"><table><thead><tr><th>الاسم</th><th>الهاتف</th><th>النشاط</th><th>إجراء</th></tr></thead><tbody id="clientsTable"></tbody></table></div></div>
+</section>
+
+<section id="requests" class="panel">
+ <div class="box">
+  <h3>إضافة طلب خدمة</h3>
+  <form id="requestForm">
+   <div class="form-grid">
+    <div><label>اسم العميل</label><input id="requestClient" required></div>
+    <div><label>الخدمة</label><select id="requestService"><option>إنشاء المواقع الإلكترونية</option><option>الكتالوج الإلكتروني</option><option>ملفات الأعمال</option><option>الصيانة والتحديث</option><option>إنشاء التطبيقات</option><option>منصات المستشفيات والشركات</option></select></div>
+    <div><label>الحالة</label><select id="requestStatus"><option>جديد</option><option>قيد الدراسة</option><option>مقبول</option><option>مكتمل</option><option>مرفوض</option></select></div>
+   </div>
+   <label>تفاصيل الطلب</label><textarea id="requestDetails" rows="3"></textarea>
+   <button class="btn">حفظ الطلب</button>
+  </form>
+ </div>
+ <div class="box"><h3>قائمة الطلبات</h3><div class="table-wrap"><table><thead><tr><th>العميل</th><th>الخدمة</th><th>الحالة</th><th>التاريخ</th><th>إجراء</th></tr></thead><tbody id="requestsTable"></tbody></table></div></div>
+</section>
+
+<section id="projects" class="panel">
+ <div class="box">
+  <h3>إضافة مشروع</h3>
+  <form id="projectForm">
+   <div class="form-grid">
+    <div><label>اسم المشروع</label><input id="projectName" required></div>
+    <div><label>العميل</label><input id="projectClient" required></div>
+    <div><label>الحالة</label><select id="projectStatus"><option>قيد التنفيذ</option><option>قيد التخطيط</option><option>مكتمل</option><option>متوقف</option></select></div>
+    <div><label>تاريخ التسليم</label><input id="projectDate" type="date"></div>
+   </div>
+   <button class="btn">حفظ المشروع</button>
+  </form>
+ </div>
+ <div class="box"><h3>المشاريع المسجلة</h3><div class="table-wrap"><table><thead><tr><th>المشروع</th><th>العميل</th><th>الحالة</th><th>التسليم</th><th>إجراء</th></tr></thead><tbody id="projectsTable"></tbody></table></div></div>
+</section>
+<section id="ai" class="panel">
+  <div class="box">
+    <h3>المساعد الذكي المحلي — MIC AI</h3>
+    <p>محادثة مباشرة مع نموذج Ollama الموجود على جهازك.</p>
+    <div id="aiStatus" class="ai-status offline">جارٍ فحص الاتصال...</div>
+    <div id="aiMessages" class="ai-messages" aria-live="polite">
+      <div class="ai-message assistant">مرحباً! أنا مساعد MIC المحلي. كيف يمكنني مساعدتك في تطوير المشروع؟</div>
+    </div>
+    <form id="aiForm" class="ai-form">
+      <textarea id="aiPrompt" maxlength="4000" required placeholder="اكتب طلبك هنا..."></textarea>
+      <button id="aiSend" class="btn" type="submit">إرسال</button>
+    </form>
+    <p class="subtitle">هذه المرحلة للمحادثة والتحليل فقط؛ لا يملك المساعد صلاحية تعديل الملفات.</p>
+  </div>
+</section>
+</main>
+</div>
+<script>
+function showAIPanel(btn) {
+  document.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+  document.getElementById("ai").classList.add("active");
+  document.querySelectorAll(".menu button").forEach(x => x.classList.remove("active"));
+  btn.classList.add("active");
+  document.getElementById("pageTitle").textContent = "المساعد الذكي المحلي";
+}
+</script>
+<script src="/admin/dashboard.js" defer></script>
+<script src="/admin/ai.js" defer></script>
+</body>
+</html>
