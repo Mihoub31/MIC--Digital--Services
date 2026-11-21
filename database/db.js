@@ -1,7 +1,11 @@
 const Database = require('better-sqlite3');
+const fs = require('fs');
 const path = require('path');
 
-const db = new Database(path.join(__dirname, 'mic-digital-services.sqlite'));
+const dataDir = process.env.MIC_DATA_DIR || __dirname;
+fs.mkdirSync(dataDir, { recursive: true });
+
+const db = new Database(path.join(dataDir, 'mic-digital-services.sqlite'));
 
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');

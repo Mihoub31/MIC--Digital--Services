@@ -17,6 +17,7 @@ if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '127.0.0.1';
 const adminDir = path.join(__dirname, '..', 'admin');
 
 if (process.env.NODE_ENV === 'production') {
@@ -26,16 +27,55 @@ if (process.env.NODE_ENV === 'production') {
 app.disable('x-powered-by');
 
 app.use(helmet({
-  contentSecurityPolicy: false
+  contentSecurityPolicy: {
+    useDefaults: false,
+    directives: {
+      defaultSrc: ["'self'"],
+      baseUri: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:"],
+      fontSrc: ["'self'", "data:"],
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      formAction: ["'self'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null
+    }
+  },
+  frameguard: { action: 'deny' }
 }));
 
 app.use(express.json({ limit: '100kb' }));
 app.use(express.urlencoded({ extended: false, limit: '20kb' }));
 
+app.use(['/api', '/admin'], (req, res, next) => {
+  res.set('Cache-Control', 'no-store');
+  next();
+});
+
+app.use('/api', (req, res, next) => {
+  if (['GET', 'HEAD', 'OPTIONS'].includes(req.method)) return next();
+
+  const origin = req.get('origin');
+  if (!origin) return next();
+
+  let originHost = null;
+  try {
+    originHost = new URL(origin).host;
+  } catch {}
+
+  if (!originHost || originHost !== req.get('host')) {
+    return res.status(403).json({ error: 'Cross-origin request rejected.' });
+  }
+
+  next();
+});
+
 app.use(session({
   store: new SQLiteStore({
     db: 'sessions.sqlite',
-    dir: path.join(__dirname, '..', 'database'),
+    dir: process.env.MIC_DATA_DIR || path.join(__dirname, '..', 'database'),
     table: 'sessions'
   }),
   name: 'mic_admin_session',
@@ -62,19 +102,23 @@ const loginLimiter = rateLimit({
   limit: 10,
   standardHeaders: 'draft-8',
   legacyHeaders: false,
-  message: { error: 'Ù…Ø­Ø§ÙˆÙ„Ø§Øª ÙƒØ«ÙŠØ±Ø©. Ø­Ø§ÙˆÙ„ Ø¨Ø¹Ø¯ 15 Ø¯Ù‚ÙŠÙ‚Ø©.' }
+  message: { error: 'محاولات كثيرة. حاول بعد 15 دقيقة.' }
 });
 
 app.use('/api', apiLimiter);
 
 function requireAdmin(req, res, next) {
   if (req.session && req.session.adminId) return next();
-  return res.status(401).json({ error: 'ÙŠØ¬Ø¨ ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„ Ø£ÙˆÙ„Ø§Ù‹.' });
+  return res.status(401).json({ error: 'يجب تسجيل الدخول أولاً.' });
 }
 
 // Public website
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'index.html'));
+});
+
+app.get('/site.js', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'site.js'));
 });
 
 // Health check
@@ -110,7 +154,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res, next) => {
     const password = String(req.body.password || '');
 
     if (!username || !password || username.length > 100 || password.length > 200) {
-      return res.status(401).json({ error: 'Ø¨ÙŠØ§Ù†Ø§Øª Ø§Ù„Ø¯Ø®ÙˆÙ„ ØºÙŠØ± ØµØ­ÙŠØ­Ø©.' });
+      return res.status(401).json({ error: 'بيانات الدخول غير صحيحة.' });
     }
 
     const user = db.prepare(
@@ -122,7 +166,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res, next) => {
       : await bcrypt.compare(password, '$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalid');
 
     if (!valid || !user) {
-      return res.status(401).json({ error: 'Ø§Ø³Ù… Ø§Ù„Ù…Ø³ØªØ®Ø¯Ù… Ø£Ùˆ ÙƒÙ„Ù…Ø© Ø§Ù„Ù…Ø±ÙˆØ± ØºÙŠØ± ØµØ­ÙŠØ­Ø©.' });
+      return res.status(401).json({ error: 'اسم المستخدم أو كلمة المرور غير صحيحة.' });
     }
 
     req.session.regenerate((error) => {
@@ -162,9 +206,9 @@ app.post('/api/auth/logout', requireAdmin, (req, res, next) => {
   });
 });
 
-// Protect every admin file except the login page
+// Protect every admin file except the login page and its script
 app.use('/admin', (req, res, next) => {
-  if (req.path === '/login.html') return next();
+  if (req.path === '/login.html' || req.path === '/login.js') return next();
   if (req.session && req.session.adminId) return next();
   return res.redirect('/admin/login');
 }, express.static(adminDir));
@@ -236,20 +280,20 @@ app.post("/api/admin/:type", requireAdmin, (req, res) => {
 });
 
 app.delete("/api/admin/:type/:id", requireAdmin, (req, res) => {
-  const table = {
-    clients: "clients",
-    requests: "requests",
-    projects: "projects"
+  const deleteSql = {
+    clients: "DELETE FROM clients WHERE id = ?",
+    requests: "DELETE FROM requests WHERE id = ?",
+    projects: "DELETE FROM projects WHERE id = ?"
   }[req.params.type];
 
   const id = Number(req.params.id);
-  if (!table) return res.status(404).json({ error: "Unknown data type" });
+  if (!deleteSql) return res.status(404).json({ error: "Unknown data type" });
   if (!Number.isSafeInteger(id) || id < 1) {
     return res.status(400).json({ error: "Invalid record ID" });
   }
 
   try {
-    const result = db.prepare(`DELETE FROM ${table} WHERE id = ?`).run(id);
+    const result = db.prepare(deleteSql).run(id);
     if (!result.changes) return res.status(404).json({ error: "Record not found" });
     res.json({ ok: true });
   } catch (error) {
@@ -404,11 +448,11 @@ app.use((req, res) => {
 app.use((error, req, res, next) => {
   console.error('Server error:', error.message);
   if (res.headersSent) return next(error);
-  res.status(500).json({ error: 'Ø­Ø¯Ø« Ø®Ø·Ø£ Ø¯Ø§Ø®Ù„ÙŠ ÙÙŠ Ø§Ù„Ø®Ø§Ø¯Ù….' });
+  res.status(500).json({ error: 'حدث خطأ داخلي في الخادم.' });
 });
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`MIC Digital Services running on port ${PORT}`);
+const server = app.listen(PORT, HOST, () => {
+  console.log(`MIC Digital Services running on http://${HOST}:${PORT}`);
 });
 
 let shuttingDown = false;

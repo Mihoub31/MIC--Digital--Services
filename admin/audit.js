@@ -39,15 +39,35 @@
     return data;
   }
 
+  function normalizeAnalysis(data) {
+    const analysis = data.analysis;
+
+    if (typeof analysis === "string") {
+      return { model: data.model || "غير محدد", answer: analysis };
+    }
+
+    if (analysis && typeof analysis === "object") {
+      return {
+        model: analysis.model || data.model || "غير محدد",
+        answer: typeof analysis.answer === "string" ? analysis.answer : ""
+      };
+    }
+
+    return { model: data.model || "غير محدد", answer: "" };
+  }
+
   function displayResult(data) {
-    const analysis = data.analysis || {};
+    const { model, answer } = normalizeAnalysis(data);
+    const auditSummary = data.summary || {};
+    const severity = auditSummary.bySeverity || {};
 
     summary.textContent =
-      `النموذج: ${analysis.model || "غير محدد"} | الملفات المفحوصة: ${data.filesAnalyzed ?? 0} | الأحرف: ${data.charactersReviewed ?? 0} | الملفات المتجاوزة: ${(data.skippedFiles || []).length}`;
+      `النموذج: ${model} | الملفات المفحوصة: ${data.filesAnalyzed ?? 0} | الأحرف: ${data.charactersReviewed ?? 0} | الملفات المتجاوزة: ${(data.skippedFiles || []).length}` +
+      (data.findings
+        ? ` | مؤكدة: ${auditSummary.confirmed ?? 0} | تحتاج تحققاً: ${auditSummary.needsReview ?? 0} | عالية: ${severity.high ?? 0}`
+        : "");
 
-    report.textContent = typeof analysis.answer === "string"
-      ? analysis.answer
-      : JSON.stringify(analysis, null, 2);
+    report.textContent = answer || "لم يصل تقرير من الخادم.";
   }
 
   async function loadHistory() {

@@ -73,16 +73,22 @@ async function render() {
     newCount.textContent = r.filter(x => x.status === NEW_STATUS).length;
 
     clientsTable.innerHTML = c.map(x =>
-      `<tr><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.business)}</td><td><button class="btn secondary" onclick="removeItem('clients',${Number(x.id)})">حذف</button></td></tr>`
+      `<tr><td>${esc(x.name)}</td><td>${esc(x.phone)}</td><td>${esc(x.business)}</td><td><button class="btn secondary" type="button" data-remove="clients" data-id="${Number(x.id)}">حذف</button></td></tr>`
     ).join("");
 
     requestsTable.innerHTML = r.map(x =>
-      `<tr><td>${esc(x.client)}</td><td>${esc(x.service)}</td><td>${esc(x.status)}</td><td>${esc(x.date)}</td><td><button class="btn secondary" onclick="removeItem('requests',${Number(x.id)})">حذف</button></td></tr>`
+      `<tr><td>${esc(x.client)}</td><td>${esc(x.service)}</td><td>${esc(x.status)}</td><td>${esc(x.date)}</td><td><button class="btn secondary" type="button" data-remove="requests" data-id="${Number(x.id)}">حذف</button></td></tr>`
     ).join("");
 
     projectsTable.innerHTML = p.map(x =>
-      `<tr><td>${esc(x.name)}</td><td>${esc(x.client)}</td><td>${esc(x.status)}</td><td>${esc(x.date)}</td><td><button class="btn secondary" onclick="removeItem('projects',${Number(x.id)})">حذف</button></td></tr>`
+      `<tr><td>${esc(x.name)}</td><td>${esc(x.client)}</td><td>${esc(x.status)}</td><td>${esc(x.date)}</td><td><button class="btn secondary" type="button" data-remove="projects" data-id="${Number(x.id)}">حذف</button></td></tr>`
     ).join("");
+
+    document.querySelectorAll("button[data-remove]").forEach(button => {
+      button.addEventListener("click", () => {
+        removeItem(button.dataset.remove, Number(button.dataset.id));
+      });
+    });
 
     recentRequests.innerHTML = r.length
       ? r.slice(0, 5).map(x => `<p>${esc(x.client)} — ${esc(x.service)} — ${esc(x.status)}</p>`).join("")
