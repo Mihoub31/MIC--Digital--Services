@@ -1,21 +1,27 @@
 const fs = require('fs').promises;
 const path = require('path');
 const ollama = require('./ollama');
+const { runStaticAnalysis } = require('./audit-static');
+const { ALLOWED_FILES, MAX_FILE_BYTES } = require('./project-scope');
 
 const ROOT = path.resolve(__dirname, '..');
+const AI_MODEL = process.env.OLLAMA_MODEL || 'qwen2.5-coder:0.5b';
 
-const ALLOWED_FILES = [
-  'server/server.js',
-  'server/ollama.js',
-  'server/agent.js',
-  'database/db.js',
-  'admin/index.html',
-  'admin/dashboard.js',
-  'admin/ai.js',
-  'admin/audit.js',
-  'package.json',
-  'index.html'
-];
+const CATEGORY_LABELS = {
+  secrets: 'Secret management',
+  session: 'Session security',
+  network: 'Network exposure',
+  headers: 'Security headers',
+  authentication: 'Authentication',
+  'rate-limiting': 'Rate limiting',
+  sql: 'SQL safety',
+  'file-operations': 'File and command operations',
+  'error-handling': 'Error handling',
+  'input-validation': 'Input validation',
+  'password-hashing': 'Password hashing',
+  'agent-scope': 'Agent scope',
+  'prompt-injection': 'Prompt injection'
+};
 
 async function listFiles() {
   const result = [];
@@ -42,7 +48,7 @@ async function readFile(relativePath) {
   const fullPath = path.resolve(ROOT, relativePath);
   const stat = await fs.stat(fullPath);
 
-  if (!stat.isFile() || stat.size > 30000) {
+  if (!stat.isFile() || stat.size > MAX_FILE_BYTES) {
     throw new Error('File is unavailable or exceeds the size limit');
   }
 
@@ -88,188 +94,129 @@ Do not invent vulnerabilities. If evidence is insufficient, say so.
 
   const answer = await ollama.ask(prompt);
 
-  return { ok: true, path: file.path, analysis: answer };
+  return {
+    ok: true,
+    path: file.path,
+    analysis: {
+      model: answer.model,
+      answer: answer.answer
+    }
+  };
+}
+
+function buildReport(staticResult) {
+  const { findings, summary, filesAnalyzed, skippedFiles, charactersReviewed, generatedAt } = staticResult;
+
+  const lines = [
+    '# MIC Digital Services — Security Audit v3',
+    '',
+    `Generated at: ${generatedAt}`,
+    `Files analyzed: ${filesAnalyzed}`,
+    `Characters reviewed: ${charactersReviewed}`,
+    `Files skipped: ${skippedFiles.length}`,
+    'Analysis mode: read-only static inspection, no code execution.',
+    '',
+    '## Summary',
+    `- Confirmed findings: ${summary.confirmed}`,
+    `- Potential risks requiring human verification: ${summary.needsReview}`,
+    `- Informational observations: ${summary.informational}`,
+    `- Severity: high ${summary.bySeverity.high} · medium ${summary.bySeverity.medium} · low ${summary.bySeverity.low} · info ${summary.bySeverity.info}`,
+    '',
+    '## Findings'
+  ];
+
+  if (!findings.length) {
+    lines.push('No findings were produced by the static checks.');
+  }
+
+  for (const finding of findings) {
+    lines.push(
+      '',
+      `### ${finding.id}. [${finding.severity.toUpperCase()}] ${CATEGORY_LABELS[finding.category] || finding.category}`,
+      `- File: ${finding.file}${finding.line ? ':' + finding.line : ''}`,
+      `- Verification: ${finding.verificationStatus}`,
+      `- Evidence: ${finding.evidence || 'no single line evidence'}`,
+      `- Explanation: ${finding.explanation}`,
+      `- Remediation: ${finding.remediation}`
+    );
+  }
+
+  lines.push(
+    '',
+    '## Skipped files',
+    ...(skippedFiles.length ? skippedFiles.map(item => `- ${item}`) : ['- None']),
+    '',
+    '## Method and limits',
+    '- Static checks inspect an explicit allowlist of source files only.',
+    '- .env files, SQLite databases, backups and runtime data are never read or sent to the local model.',
+    '- No exploit, fuzzing or runtime attack test was executed.',
+    '- A control found in the source does not prove the whole application is secure.',
+    '- Findings marked "needs_review" require human verification.',
+    '- The audit never modifies, deletes or executes project files.'
+  );
+
+  return lines.join('\n');
+}
+
+function buildAiPrompt(findings) {
+  const evidence = findings.slice(0, 30).map(item =>
+    `- [${item.severity}] ${CATEGORY_LABELS[item.category] || item.category} at ${item.file}${item.line ? ':' + item.line : ''} — ${item.explanation}`
+  ).join('\n');
+
+  return `
+You are MIC AI, the local technical assistant of MIC Digital Services.
+
+The static analysis below is the only evidence available. Write in English.
+
+STATIC EVIDENCE:
+${evidence || 'No static findings were produced.'}
+
+Provide:
+1. A short, prioritized set of remediation steps (maximum 10 bullets).
+2. Any risk that needs human verification first.
+3. One sentence stating the limits of this analysis.
+
+Rules:
+- Do not invent files, routes, dependencies or test results.
+- Do not claim that tests were executed, files modified or vulnerabilities exploited.
+- If the evidence is insufficient, say so explicitly.
+- Do not request secrets or credentials.
+`;
 }
 
 async function analyzeProject() {
-  const sections = [];
-  const skipped = [];
-  const findings = [];
-  const MAX_TOTAL_CHARS = 45000;
-  let totalChars = 0;
+  const staticResult = await runStaticAnalysis();
+  staticResult.generatedAt = new Date().toISOString();
 
-  for (const relativePath of ALLOWED_FILES) {
-    try {
-      const file = await readFile(relativePath);
-      const safeContent = redactSecrets(file.content);
-
-      if (totalChars + safeContent.length > MAX_TOTAL_CHARS) {
-        skipped.push(relativePath + ' (project size limit)');
-        continue;
-      }
-
-      sections.push({
-        path: relativePath,
-        content: safeContent
-      });
-
-      totalChars += safeContent.length;
-    } catch (error) {
-      skipped.push(relativePath + ' (' + error.message + ')');
-    }
-  }
-
-  if (sections.length === 0) {
+  if (staticResult.filesAnalyzed === 0) {
     throw new Error('No project files were available for analysis');
   }
 
-  const contentOf = name =>
-    sections.find(file => file.path === name)?.content || '';
-
-  const server = contentOf('server/server.js');
-  const packageFile = contentOf('package.json');
-  const agent = contentOf('server/agent.js');
-
-  function record(title, status, evidence, category = 'معلومة') {
-    findings.push({
-      title,
-      status,
-      category,
-      evidence
-    });
-  }
-
-  // Detect existing security controls from actual source.
-  record(
-    'ترويسات الحماية Helmet',
-    /require\(['"]helmet['"]\)/.test(server) &&
-    /app\.use\(helmet/.test(server) ? 'موجود' : 'غير مثبت',
-    'server/server.js'
-  );
-
-  record(
-    'حماية مسارات الإدارة',
-    /function requireAdmin/.test(server) &&
-    /req\.session\.adminId/.test(server) ? 'موجودة' : 'غير مثبتة',
-    'server/server.js'
-  );
-
-  record(
-    'تحديد محاولات تسجيل الدخول',
-    /loginLimiter/.test(server) &&
-    /limit:\s*10/.test(server) ? 'موجود' : 'غير مثبت',
-    'server/server.js'
-  );
-
-  record(
-    'إعدادات ملفات تعريف الارتباط',
-    /httpOnly:\s*true/.test(server) &&
-    /sameSite:\s*['"]strict['"]/.test(server) &&
-    /secure:\s*process\.env\.NODE_ENV\s*===\s*['"]production['"]/.test(server)
-      ? 'الإعدادات المطلوبة ظاهرة في المصدر'
-      : 'تحتاج إلى مراجعة',
-    'server/server.js'
-  );
-
-  record(
-    'حماية سر الجلسة',
-    /SESSION_SECRET/.test(server) &&
-    /length\s*<\s*32/.test(server)
-      ? 'يوجد فحص لطول السر'
-      : 'الفحص غير مثبت',
-    'server/server.js'
-  );
-
-  record(
-    'تجزئة كلمات المرور',
-    /bcryptjs/.test(packageFile) &&
-    /bcrypt/.test(server)
-      ? 'المكتبة واستخدامها ظاهران'
-      : 'الاستخدام غير مثبت',
-    'package.json و server/server.js'
-  );
-
-  record(
-    'تقييد الوصول إلى ملفات الوكيل',
-    /ALLOWED_FILES/.test(agent) &&
-    /ALLOWED_FILES\.includes/.test(agent)
-      ? 'قائمة سماح موجودة'
-      : 'قائمة السماح غير مثبتة',
-    'server/agent.js'
-  );
-
-  record(
-    'فصل صلاحيات الوكيل عن تعديل الملفات',
-    /fs\.readFile/.test(agent) &&
-    !/fs\.(writeFile|unlink|rm|rename|mkdir)\s*\(/.test(agent)
-      ? 'لم يُعثر على عمليات كتابة أو حذف مباشرة في الوكيل'
-      : 'تحتاج الصلاحيات إلى مراجعة يدوية',
-    'server/agent.js'
-  );
-
-  const report = [
-    '# تدقيق MIC Digital Services - الإصدار الثاني',
-    '',
-    '## 1. نطاق الفحص',
-    `الملفات المفحوصة: ${sections.length}`,
-    `الأحرف المقروءة: ${totalChars}`,
-    `الملفات المتجاوزة: ${skipped.length}`,
-    '',
-    '## 2. فحوصات المصدر البرمجية',
-    ...findings.map((item, index) =>
-      `${index + 1}. ${item.title}\n` +
-      `   الحالة: ${item.status}\n` +
-      `   الدليل: ${item.evidence}`
-    ),
-    '',
-    '## 3. الملفات التي لم يتم فحصها',
-    ...(skipped.length ? skipped : ['لا توجد']),
-    '',
-    '## 4. حدود الفحص',
-    '- وجود إعداد في المصدر لا يثبت سلامة التطبيق بالكامل.',
-    '- عدم اكتشاف نمط معين لا يثبت غياب الثغرات.',
-    '- لم يتم تشغيل اختبارات اختراق أو تنفيذ أوامر على المشروع.',
-    '- النتائج تحتاج إلى مراجعة بشرية قبل اعتمادها.',
-    '',
-    '## 5. اقتراحات الذكاء الاصطناعي',
-    'القسم التالي استشاري فقط، وليس نتائج أمنية مؤكدة.'
-  ].join('\n');
-
-  // Send only compact evidence to the local model.
-  // Full source scanning above is independent of the model.
-  const compactEvidence = findings.map(item =>
-    `${item.title}: ${item.status} (${item.evidence})`
-  ).join('\n');
-
-  let aiAdvice = 'تعذر الحصول على اقتراحات النموذج المحلي.';
+  const report = buildReport(staticResult);
+  let aiAdvice = '';
 
   try {
-    const answer = await ollama.ask(`
-أنت مساعد تقني لمشروع MIC Digital Services.
-أجب باللغة العربية.
-حلل الأدلة المختصرة التالية فقط:
-${compactEvidence}
+    const answer = await ollama.ask(buildAiPrompt(staticResult.findings));
+    aiAdvice = (answer.answer || '').trim();
+  } catch {}
 
-قدّم اقتراحات تحسين اختيارية.
-لا تدّع وجود ثغرات مؤكدة.
-لا تخترع ملفات أو مكتبات أو مسارات API.
-لا تكرر الضوابط الموجودة باعتبارها ميزات مفقودة.
-إذا لم يوجد دليل كافٍ فقل: لا يمكن التحقق.
-لا تدّع تنفيذ اختبارات أو تعديل ملفات.
-`);
-    aiAdvice = answer.answer || aiAdvice;
-  } catch (error) {
-    aiAdvice += '\n' + error.message;
+  if (!aiAdvice) {
+    aiAdvice = 'Local AI advice is unavailable (Ollama unreachable or model not installed). The static findings above are unaffected.';
   }
+
+  const model = `MIC Static Audit v3 + ${AI_MODEL}`;
 
   return {
     ok: true,
-    filesAnalyzed: sections.length,
-    skippedFiles: skipped,
-    charactersReviewed: totalChars,
+    generatedAt: staticResult.generatedAt,
+    filesAnalyzed: staticResult.filesAnalyzed,
+    skippedFiles: staticResult.skippedFiles,
+    charactersReviewed: staticResult.charactersReviewed,
+    summary: staticResult.summary,
+    findings: staticResult.findings,
     analysis: {
-      model: 'MIC Static Audit + ' + (process.env.OLLAMA_MODEL || 'qwen2.5-coder:0.5b'),
-      answer: report + '\n\n' + aiAdvice
+      model,
+      answer: `${report}\n\n## AI recommendations (advisory)\n${aiAdvice}`
     }
   };
 }

@@ -5,6 +5,16 @@
   const input = document.getElementById("aiPrompt");
   const sendBtn = document.getElementById("aiSend");
 
+  function showAIPanel(button) {
+    document.querySelectorAll(".panel").forEach(panel => panel.classList.remove("active"));
+    document.getElementById("ai").classList.add("active");
+    document.querySelectorAll(".menu button").forEach(item => item.classList.remove("active"));
+    if (button) button.classList.add("active");
+    document.getElementById("pageTitle").textContent = "المساعد الذكي المحلي";
+  }
+
+  window.showAIPanel = showAIPanel;
+
   function addMessage(role, text) {
     const item = document.createElement("div");
     item.className = "ai-message " + role;
