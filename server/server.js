@@ -335,9 +335,60 @@ app.post('/api/agent/analyze', requireAdmin, agentLimiter, async (req, res) => {
   }
 });
 // Protected MIC Project Audit
+app.get('/api/agent/audit/history', requireAdmin, (req, res) => {
+  try {
+    const rows = db.prepare(`
+      SELECT id, model, files_analyzed AS filesAnalyzed,
+             skipped_files AS skippedFiles,
+             characters_reviewed AS charactersReviewed,
+             report, created_at AS createdAt
+      FROM audit_history
+      ORDER BY id DESC
+      LIMIT 20
+    `).all();
+
+    res.json({
+      ok: true,
+      history: rows.map(row => ({
+        ...row,
+        skippedFiles: JSON.parse(row.skippedFiles)
+      }))
+    });
+  } catch (error) {
+    console.error('Audit history error:', error.message);
+    res.status(500).json({ ok: false, error: 'Could not load audit history' });
+  }
+});
+
+// Protected read-only MIC Project Audit
 app.post('/api/agent/audit', requireAdmin, agentLimiter, async (req, res) => {
   try {
     const result = await agent.analyzeProject();
+    const analysis = result.analysis || {};
+    const model = analysis.model || '';
+    const report = typeof analysis.answer === 'string'
+      ? analysis.answer
+      : JSON.stringify(analysis);
+
+    db.prepare(`
+      INSERT INTO audit_history
+        (model, files_analyzed, skipped_files, characters_reviewed, report)
+      VALUES (?, ?, ?, ?, ?)
+    `).run(
+      model,
+      Number(result.filesAnalyzed) || 0,
+      JSON.stringify(result.skippedFiles || []),
+      Number(result.charactersReviewed) || 0,
+      report
+    );
+
+    db.prepare(`
+      DELETE FROM audit_history
+      WHERE id NOT IN (
+        SELECT id FROM audit_history ORDER BY id DESC LIMIT 20
+      )
+    `).run();
+
     res.json(result);
   } catch (error) {
     console.error('Project audit error:', error.message);

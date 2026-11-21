@@ -43,4 +43,15 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS audit_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    model TEXT NOT NULL DEFAULT '',
+    files_analyzed INTEGER NOT NULL DEFAULT 0,
+    skipped_files TEXT NOT NULL DEFAULT '[]',
+    characters_reviewed INTEGER NOT NULL DEFAULT 0,
+    report TEXT NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+`);
 module.exports = db;

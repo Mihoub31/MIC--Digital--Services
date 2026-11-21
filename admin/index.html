@@ -51,6 +51,9 @@ label{font-size:14px;font-weight:bold}
 .ai-form{display:flex;gap:10px;align-items:flex-start}
 .ai-form textarea{flex:1;min-height:75px;resize:vertical}
 .ai-form button{margin-top:7px;white-space:nowrap}
+.audit-report{white-space:pre-wrap;overflow-wrap:anywhere;background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:15px;line-height:1.8;max-height:600px;overflow:auto;font:14px Arial,Tahoma,sans-serif}
+.audit-history-item{border-bottom:1px solid var(--border);padding:12px 0}
+.audit-history-item button{margin:5px}
 </style>
 </head>
 <body>
@@ -63,6 +66,7 @@ label{font-size:14px;font-weight:bold}
     <button onclick="showPanel('requests',this)">الطلبات</button>
     <button onclick="showPanel('projects',this)">المشاريع</button>
   <button type="button" onclick="showAIPanel(this)">المساعد الذكي</button>
+<button type="button" onclick="showAuditPanel(this)">تدقيق المشروع</button>
 </nav>
 </aside>
 <main class="main">
@@ -144,6 +148,25 @@ label{font-size:14px;font-weight:bold}
     <p class="subtitle">هذه المرحلة للمحادثة والتحليل فقط؛ لا يملك المساعد صلاحية تعديل الملفات.</p>
   </div>
 </section>
+<section id="audit" class="panel">
+  <div class="box">
+    <h3>تدقيق مشروع MIC</h3>
+    <p>تحليل الملفات المسموح بها للقراءة فقط، دون تعديلها أو حذفها.</p>
+    <button id="runAudit" class="btn" type="button">بدء التدقيق الآن</button>
+    <span id="auditStatus" class="ai-status offline">جاهز للتدقيق</span>
+    <p class="subtitle">نتائج الذكاء الاصطناعي اقتراحات أولية وليست إثباتاً لوجود ثغرات. يجب مراجعتها بشرياً.</p>
+  </div>
+  <div class="box">
+    <h3>ملخص التدقيق</h3>
+    <p id="auditSummary">لم يتم إجراء تدقيق بعد.</p>
+    <h3>التقرير</h3>
+    <pre id="auditReport" class="audit-report">لا يوجد تقرير بعد.</pre>
+  </div>
+  <div class="box">
+    <h3>سجل آخر 20 تدقيقاً</h3>
+    <div id="auditHistory">جارٍ تحميل السجل...</div>
+  </div>
+</section>
 </main>
 </div>
 <script>
@@ -157,5 +180,6 @@ function showAIPanel(btn) {
 </script>
 <script src="/admin/dashboard.js" defer></script>
 <script src="/admin/ai.js" defer></script>
+<script src="/admin/audit.js" defer></script>
 </body>
 </html>
