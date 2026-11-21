@@ -10,3 +10,7 @@ database/*.sqlite-wal
 backup/
 *.backup*
 *.bak
+
+# Integration runtime: local installs, sandboxes and generated artifacts
+services/
+artifacts/
