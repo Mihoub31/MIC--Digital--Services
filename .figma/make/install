@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+set -eu
+
+# Use matching headers bundled with Node instead of downloading them again.
+node_prefix="$(node -p 'require("path").dirname(require("path").dirname(process.execPath))')"
+if [ -f "$node_prefix/include/node/node.h" ]; then
+  export npm_config_nodedir="$node_prefix"
+fi
+
+exec npm ci
