@@ -1,107 +1,246 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="fr" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MIC Digital Services</title>
+<meta name="theme-color" content="#f6f7f2">
+<meta name="description" content="MIC Digital Services accompagne les entreprises algériennes : sites web, applications, catalogues et solutions digitales sur mesure.">
+<title>MIC Digital Services — Votre prochain chapitre digital</title>
 <style>
+:root{--paper:#f6f7f2;--ink:#182b2b;--muted:#6c7773;--green:#d5f875;--line:#dfe4da;--white:#fff;--radius:20px}
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f5f7fb;color:#172033}
-header{background:#101c35;color:white;padding:24px 7%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
-.logo{font-size:25px;font-weight:bold;color:#42d6c5}
-nav button, .lang button{padding:9px 13px;border:0;border-radius:7px;cursor:pointer;margin:3px}
-.lang button{background:#263958;color:white}
-.hero{text-align:center;padding:75px 20px;background:linear-gradient(135deg,#12213d,#174d67);color:white}
-.hero h1{font-size:38px;margin:0 0 18px}
-.hero p{font-size:19px;line-height:1.8}
-.btn{display:inline-block;background:#12b89e;color:white;text-decoration:none;padding:13px 22px;border-radius:8px;font-weight:bold;margin:10px}
-section{padding:45px 7%;text-align:center}
-h2{font-size:28px;color:#142c4b}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:25px}
-.card{background:white;padding:25px;border-radius:13px;box-shadow:0 4px 18px #10204012}
-.card h3{color:#087e83}
-.card p{line-height:1.8;color:#596579}
-.price{font-weight:bold;color:#087e83}
-.contact{background:#e8f4f5}
-footer{background:#101c35;color:white;text-align:center;padding:22px}
+html{scroll-behavior:smooth;scroll-padding-top:100px}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer}
+button,a{-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid #6d9441;outline-offset:5px}
+::selection{background:var(--green);color:var(--ink)}
+.wrap{width:min(1240px,calc(100% - 100px));margin-inline:auto}
+.skip{position:fixed;inset-block-start:-100px;inset-inline-start:20px;z-index:20;padding:16px;background:var(--green)}
+.skip:focus{inset-block-start:10px}
+.header{height:100px;display:flex;align-items:center;justify-content:space-between;gap:30px;border-bottom:1px solid var(--line);position:relative;z-index:5}
+.brand{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.brand-mark{width:43px;height:43px;background:var(--ink);color:var(--green);display:grid;place-items:center;border-radius:12px;font-size:25px;font-weight:800;letter-spacing:-5px;padding-inline-end:5px;transform:rotate(-5deg)}
+.brand-name{font-weight:800;font-size:25px;letter-spacing:-1.4px}
+.brand-name small{display:block;font-size:9px;letter-spacing:2px;font-weight:600;margin-top:2px;text-transform:uppercase}
+.nav{display:flex;gap:29px;align-items:center;font-size:13px;font-weight:600}
+.nav>a:not(.button){padding-block:10px;color:#5c6863}
+.nav>a:hover{color:var(--ink)}
+.header-end{display:flex;gap:20px;align-items:center}
+.lang{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:30px;padding:4px}
+.lang button{border:0;background:transparent;padding:7px 8px;border-radius:20px;font-size:10px;color:var(--muted)}
+.lang button[aria-pressed=true]{background:var(--ink);color:#fff}
+.button{display:inline-flex;align-items:center;justify-content:center;gap:24px;border:1px solid transparent;border-radius:9px;padding:17px 22px;font-size:13px;font-weight:700;line-height:1.3;transition:transform .2s,background .2s}
+.button:hover{transform:translateY(-3px)}
+.button.dark{background:var(--ink);color:#fff}
+.button.lime{background:var(--green);color:var(--ink)}
+.button.outline{border-color:#d1d8cc;background:transparent}
+.header .button{font-size:12px;padding:13px 17px}
+.arrow{font-size:20px;line-height:1;display:inline-block;font-weight:400}
+.menu-toggle{display:none;background:transparent;border:1px solid var(--line);border-radius:8px;width:42px;height:40px;font-size:22px}
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:35px;align-items:center;padding-block:77px 70px}
+.eyebrow{display:flex;align-items:center;gap:9px;font-size:10px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase}
+.dot{width:7px;height:7px;border-radius:50%;background:#6f9c3a;box-shadow:0 0 0 4px #e9efdf;flex-shrink:0}
+.hero h1{font-size:clamp(48px,5.1vw,72px);font-weight:600;letter-spacing:-4px;line-height:1.07;margin:27px 0 24px;max-width:630px}
+.hero h1 em{font-style:normal;position:relative;white-space:nowrap;z-index:0}
+.hero h1 em:after{content:"";position:absolute;height:14px;background:var(--green);inset-inline:0;bottom:4px;z-index:-1;transform:rotate(-2deg)}
+.intro{font-size:15px;line-height:1.85;color:var(--muted);max-width:420px}
+.hero-actions{display:flex;align-items:center;gap:12px;margin-top:29px;flex-wrap:wrap}
+.hero-note{display:flex;align-items:center;gap:10px;font-size:10px;color:var(--muted);margin-top:25px}
+.check{display:inline-grid;place-items:center;border:1px solid #cbd6c4;border-radius:50%;width:17px;height:17px;color:#567e35;font-size:10px}
+.visual{height:465px;position:relative;display:flex;align-items:center;justify-content:center;isolation:isolate}
+.visual-bg{position:absolute;inset:8px 0 0;border-radius:30px;background:#e9eddf;background-image:radial-gradient(#c5cfbc 1px,transparent 1px);background-size:18px 18px;z-index:-2;overflow:hidden}
+.visual-bg:after{content:"";position:absolute;width:320px;height:320px;border:1px solid #c6d0bc;border-radius:50%;inset:70px auto auto 100px;box-shadow:0 0 0 44px #dce3d33b,0 0 0 45px #ccd5c066,0 0 0 89px #e0e7d53b,0 0 0 90px #ccd5c066}
+.browser{width:87%;background:#fff;border:1px solid #e0e4dc;border-radius:13px;box-shadow:0 24px 45px #273d2420;transform:rotate(-5deg);overflow:hidden;margin-bottom:18px}
+.browser-bar{height:31px;border-bottom:1px solid #edf0e9;display:flex;align-items:center;padding:0 12px;gap:4px}
+.browser-bar i{width:5px;height:5px;background:#dce2d6;border-radius:50%}
+.browser-url{margin:auto;font-size:7px;color:#8c9485;background:#f5f6f2;width:50%;text-align:center;border-radius:3px;padding:4px}
+.mock-body{padding:20px 24px 0;background:#fcfcf8}
+.mock-nav{display:flex;justify-content:space-between;font-size:7px;color:#6d786a}
+.mock-logo{font-weight:800;color:#253b29;font-size:11px}
+.mock-nav span:last-child{background:#d7e9c9;padding:4px 8px;border-radius:3px}
+.mock-main{display:flex;align-items:center;min-height:194px;gap:8px}
+.mock-copy{width:56%}
+.mock-copy small{font-size:5px;letter-spacing:1px;color:#7d896f}
+.mock-copy strong{display:block;font-size:29px;line-height:1.08;letter-spacing:-1.3px;margin-top:10px;font-weight:500}
+.mock-line{height:3px;width:90%;background:#dfe4d7;margin-top:12px;border-radius:3px;box-shadow:0 6px 0 #e8ebdf}
+.mock-cta{background:#2f472d;color:white;display:inline-block;font-size:6px;padding:7px 11px;margin-top:20px;border-radius:3px}
+.sculpture{width:135px;height:153px;position:relative;transform:rotate(15deg);margin:15px auto}
+.sculpture i{display:block;position:absolute;inset:0;border:23px solid #a4b590;border-radius:50%;box-shadow:inset 4px 5px 8px #536b4d55,6px 7px 10px #344c3433;background:linear-gradient(130deg,#fff4,#8ba47d33)}
+.sculpture i:nth-child(2){transform:rotateY(62deg) rotateZ(30deg);border-color:#c9d3b7}
+.sculpture i:nth-child(3){transform:rotateX(62deg) rotateZ(-35deg);border-color:#78946b}
+.mock-bottom{display:flex;justify-content:space-between;border-top:1px solid #e2e6d8;padding:14px 0;font-size:6px;color:#75836c;letter-spacing:1px}
+.floating{position:absolute;background:#fff;border:1px solid #e9ece2;border-radius:11px;box-shadow:0 12px 30px #233a2512;display:flex;gap:12px;align-items:center;padding:15px 19px}
+.floating .badge{width:34px;height:34px;background:#eef5e4;border-radius:9px;display:grid;place-items:center;color:#547833}
+.floating strong{font-size:11px;display:block;margin-bottom:5px}
+.floating small{font-size:9px;color:var(--muted)}
+.float-top{top:21px;inset-inline-end:-12px;transform:rotate(3deg)}
+.float-bottom{bottom:28px;inset-inline-start:7px;transform:rotate(3deg)}
+.float-bottom .badge{background:var(--green)}
+.orbit-mark{position:absolute;bottom:34px;inset-inline-end:29px;font-size:65px;color:#5a7052;line-height:1;transform:rotate(16deg)}
+.ticker{border-block:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:18px;padding-block:24px;font-size:11px;color:#7a847a}
+.ticker strong{font-size:13px;color:#465648;font-weight:500;display:flex;align-items:center;gap:10px}
+.ticker strong:before{content:"+";font-size:21px;color:#96a687;font-weight:400}
+.services{padding-block:80px}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:30px;margin-bottom:34px}
+.section-head h2{font-size:38px;font-weight:500;letter-spacing:-1.5px;line-height:1.15;max-width:520px;margin:15px 0 0}
+.section-head>p{font-size:13px;line-height:1.8;color:var(--muted);max-width:285px;margin:0 0 3px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{padding:28px 27px 23px;background:#fff;border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;position:relative;transition:transform .25s,border-color .25s,box-shadow .25s}
+.card:hover{transform:translateY(-5px);border-color:#a5ba8c;box-shadow:0 12px 24px #203b2510}
+.card.featured{background:#edf2e5}
+.card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:25px}
+.icon-box{width:42px;height:42px;background:#f0f3eb;border:1px solid #e1e7d8;border-radius:11px;display:grid;place-items:center}
+.featured .icon-box{background:var(--green);border-color:transparent}
+svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.tag{font-size:8px;letter-spacing:1px;text-transform:uppercase;background:#dcebc9;border-radius:20px;padding:6px 9px}
+.card h3{font-size:18px;letter-spacing:-.5px;font-weight:600;margin:0 0 12px;line-height:1.35}
+.card p{font-size:12px;line-height:1.85;color:var(--muted);margin:0 0 24px;max-width:280px;flex:1}
+.card-bottom{border-top:1px solid #e3e7dc;padding-top:18px;display:flex;align-items:center;justify-content:space-between;gap:5px}
+.price{font-size:11px;font-weight:600}
+.card-link{border:1px solid #dce3d3;border-radius:50%;width:30px;height:30px;display:grid;place-items:center;transition:background .2s}
+.card-link:hover{background:var(--green)}
+.process{background:var(--ink);color:#f6f7f2;border-radius:24px;padding:48px;margin-bottom:80px}
+.process .eyebrow{color:#bbd497}
+.process .section-head{margin-bottom:38px}
+.process h2{font-size:33px;max-width:470px}
+.process .section-head>p{color:#b3c0b7}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:35px}
+.step{border-top:1px solid #4a5c55;padding-top:22px}
+.step-number{font-size:12px;color:var(--green);display:block;margin-bottom:22px}
+.step h3{font-size:16px;font-weight:500;margin:0 0 11px}
+.step p{font-size:12px;color:#b3c0b7;line-height:1.8;margin:0;max-width:270px}
+.contact{display:flex;align-items:center;justify-content:space-between;gap:40px;padding:7px 0 70px}
+.contact h2{font-size:43px;letter-spacing:-1.7px;font-weight:500;line-height:1.15;max-width:590px;margin:18px 0}
+.contact p{color:var(--muted);font-size:13px;line-height:1.8}
+.contact-side{text-align:center;flex-shrink:0}
+.contact-side small{display:block;color:var(--muted);font-size:10px;margin-top:12px}
+.footer{border-top:1px solid var(--line);padding-block:26px;display:flex;align-items:center;justify-content:space-between;gap:25px}
+.footer .brand-name{font-size:18px}
+.footer .brand-mark{height:32px;width:32px;font-size:20px;border-radius:9px}
+.footer .brand-name small{font-size:6px;letter-spacing:1.5px}
+.footer-copy{font-size:10px;color:var(--muted)}
+.footer>a:last-child{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:8px}
+[dir=rtl] .hero h1{letter-spacing:-1.5px;line-height:1.35}
+[dir=rtl] .section-head h2,[dir=rtl] .contact h2{letter-spacing:0;line-height:1.4}
+.visual{direction:ltr}
+@media(min-width:1450px){.hero{gap:70px;padding-block:90px}.hero h1{font-size:76px}.visual{height:490px}}
+@media(max-width:1100px){.wrap{width:calc(100% - 56px)}.nav{gap:18px}.header-end{gap:12px}.header-end>.button{display:none}.hero h1{font-size:58px}.hero{gap:20px}.visual{height:430px}.mock-copy strong{font-size:25px}.sculpture{width:105px;height:125px}.sculpture i{border-width:18px}.float-top{inset-inline-end:-8px}.floating{padding:12px}.ticker{flex-wrap:wrap;justify-content:center;gap:20px 28px}.ticker>span{width:100%;text-align:center}.card{padding:24px 21px}}
+@media(max-width:760px){.wrap{width:calc(100% - 40px)}.header{height:82px;gap:12px}.brand-name{font-size:22px}.brand-mark{width:37px;height:37px}.brand-name small{font-size:7px}.header-end{margin-inline-start:auto;gap:10px}.menu-toggle{display:block}.lang button{font-size:9px;padding:6px}.nav{display:none;position:absolute;top:72px;inset-inline:0;background:var(--paper);border:1px solid var(--line);box-shadow:0 14px 25px #182b2b15;border-radius:12px;padding:18px;flex-direction:column;align-items:stretch;gap:6px}.nav.open{display:flex}.hero{grid-template-columns:1fr;padding-block:46px 35px;gap:30px}.hero h1{font-size:58px;max-width:550px;letter-spacing:-3px;margin-top:25px}.intro{font-size:14px;max-width:450px}.eyebrow{font-size:9px}.hero-note{margin-top:21px}.hero .visual{height:410px;max-width:510px;width:100%;margin-inline:auto}.mock-main{min-height:190px}.mock-copy strong{font-size:30px}.sculpture{width:130px;height:150px}.sculpture i{border-width:22px}.float-top{inset-inline-end:0;top:13px}.float-bottom{bottom:18px}.ticker{padding-block:22px;gap:12px 25px}.ticker strong{font-size:11px}.ticker strong:before{font-size:17px}.services{padding-block:55px}.section-head{display:block;margin-bottom:26px}.section-head h2{font-size:32px;max-width:420px}.section-head>p{margin-top:17px;max-width:390px;font-size:12px}.cards{grid-template-columns:repeat(2,1fr);gap:12px}.card{padding:22px 19px}.card h3{font-size:16px}.card p{font-size:11px}.card-top{margin-bottom:22px}.price{font-size:10px}.tag{font-size:6px;padding:5px 6px}.process{padding:30px 25px;margin-bottom:50px}.process h2{font-size:29px}.steps{grid-template-columns:1fr;gap:24px}.step{display:grid;grid-template-columns:25px 1fr;gap:0 14px;padding-top:19px}.step-number{grid-row:span 2;margin-top:3px}.step p{max-width:none}.step h3{font-size:16px}.contact{display:block;padding-bottom:45px}.contact h2{font-size:35px}.contact-side{text-align:start;margin-top:25px}.footer{flex-wrap:wrap;gap:22px}.footer-copy{order:3;width:100%;font-size:9px}.footer>a:last-child{margin-inline-start:auto}}
+@media(max-width:420px){.wrap{width:calc(100% - 32px)}.hero h1{font-size:47px}.hero .button{padding:15px 17px;gap:15px;font-size:11px}.hero .visual{height:345px}.mock-body{padding:15px 17px 0}.mock-main{min-height:160px}.mock-copy strong{font-size:25px}.sculpture{width:95px;height:115px}.sculpture i{border-width:17px}.floating strong{font-size:9px}.floating small{font-size:8px}.floating .badge{width:27px;height:27px}.float-top{top:6px}.orbit-mark{font-size:48px;bottom:23px}.cards{grid-template-columns:1fr}.card p{font-size:12px;max-width:none}.card h3{font-size:19px}.tag{font-size:8px}.card-top{margin-bottom:18px}.price{font-size:11px}.brand-name{font-size:20px}.brand-name small{font-size:6px}.lang{padding:3px}.lang button{padding:6px 5px}.menu-toggle{width:35px}.header-end{gap:7px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{transition:none!important}}
 </style>
 </head>
 <body>
-
-<header>
-  <div class="logo">MIC Digital Services</div>
-  <div class="lang">
-    <button type="button" data-lang="ar">العربية</button>
-    <button type="button" data-lang="fr">Français</button>
-    <button type="button" data-lang="en">English</button>
+<a class="skip" href="#main" id="skipLink">Aller au contenu</a>
+<header class="header wrap">
+  <a href="#" class="brand" aria-label="MIC Digital Services">
+    <span class="brand-mark" aria-hidden="true">m.</span>
+    <span class="brand-name">mic<span aria-hidden="true">.</span><small>Digital Services</small></span>
+  </a>
+  <nav class="nav" id="navigation" aria-label="Navigation principale">
+    <a href="#services" id="navServices">Nos services</a>
+    <a href="#approach" id="navApproach">Notre approche</a>
+    <a href="#contact" id="navContact">Parlons de votre projet</a>
+  </nav>
+  <div class="header-end">
+    <div class="lang" role="group" aria-label="Langue">
+      <button type="button" data-lang="fr" aria-pressed="true" lang="fr" aria-label="Français">FR</button>
+      <button type="button" data-lang="en" aria-pressed="false" lang="en" aria-label="English">EN</button>
+      <button type="button" data-lang="ar" aria-pressed="false" lang="ar" aria-label="العربية">عربي</button>
+    </div>
+    <a class="button dark wa" href="https://wa.me/213771626233" target="_blank" rel="noopener noreferrer"><span id="headerCta">Un projet en tête ?</span><span class="arrow" aria-hidden="true">↗</span></a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation" aria-label="Menu"><span aria-hidden="true">☰</span></button>
   </div>
 </header>
-
-<div class="hero">
-  <h1 id="title">حلول رقمية لتطوير أعمالك</h1>
-</div>
-
-
-<section id="services">
-  <h2 id="servicesTitle">خدماتنا الرقمية</h2>
-  <div class="cards">
-
-    <div class="card">
-      <h3 id="s1">إنشاء المواقع الإلكترونية</h3>
-      <p id="d1">مواقع احترافية ومتجاوبة مع الهاتف والكمبيوتر لنشاطك التجاري.</p>
-      <div class="price" id="p1">ابتداءً من 8,000 دج</div>
+<main id="main">
+  <section class="hero wrap" aria-labelledby="title">
+    <div class="hero-copy">
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span><span id="heroLabel">Votre partenaire digital en Algérie</span></div>
+      <h1 id="title"><span id="titleStart">De l’ambition.</span><br><span id="titleMiddle">Au concret.</span><br><em id="titleAccent">En digital.</em></h1>
+      <p class="intro" id="intro">Sites web, applications et solutions sur mesure. Nous transformons vos idées en expériences digitales qui font avancer votre activité.</p>
+      <div class="hero-actions">
+        <a class="button dark wa" href="https://wa.me/213771626233" target="_blank" rel="noopener noreferrer"><span id="heroBtn">Parlons de votre projet</span><span class="arrow" aria-hidden="true">↗</span></a>
+        <a class="button outline" href="#services"><span id="discoverBtn">Explorer nos services</span><span class="arrow" aria-hidden="true">↓</span></a>
+      </div>
+      <div class="hero-note"><span class="check" aria-hidden="true">✓</span><span id="heroNote">Un accompagnement humain. Des solutions à votre mesure.</span></div>
     </div>
-
-    <div class="card">
-      <h3 id="s2">الكتالوج الإلكتروني</h3>
-      <p id="d2">عرض منتجاتك وخدماتك بطريقة منظمة وسهلة للزبائن.</p>
-      <div class="price" id="p2">ابتداءً من 5,000 دج</div>
+    <div class="visual" role="img" aria-label="Illustration d’un site web moderne avec une sculpture abstraite et des interfaces adaptatives">
+      <div class="visual-bg"></div>
+      <div class="browser">
+        <div class="browser-bar"><i></i><i></i><i></i><span class="browser-url">votre-prochain-projet.dz</span></div>
+        <div class="mock-body">
+          <div class="mock-nav"><span class="mock-logo">forma.</span><span>Studio &nbsp; &nbsp; Collection &nbsp; &nbsp; À propos</span><span>Contact ↗</span></div>
+          <div class="mock-main">
+            <div class="mock-copy"><small>DES IDÉES QUI PRENNENT FORME</small><strong>Less, but<br>better.</strong><div class="mock-line"></div><span class="mock-cta">Découvrir la collection &nbsp; ↗</span></div>
+            <div class="sculpture"><i></i><i></i><i></i></div>
+          </div>
+          <div class="mock-bottom"><span>DESIGN INTENTIONNEL</span><span>PENSÉ POUR VOUS</span><span>DEPUIS L’ALGÉRIE</span></div>
+        </div>
+      </div>
+      <div class="floating float-top"><span class="badge"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 12 4 4 8-9"/></svg></span><span><strong id="floatTitle">Pensé pour votre réussite</strong><small id="floatText">Du premier clic au prochain chapitre.</small></span></div>
+      <div class="floating float-bottom"><span class="badge"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="13" height="11" rx="2"/><path d="M7 19h5m-2-4v4"/><rect x="16" y="10" width="5" height="10" rx="1"/></svg></span><span><strong id="responsiveTitle">Une expérience sans limites</strong><small id="responsiveText">Mobile · Tablette · Ordinateur</small></span></div>
+      <span class="orbit-mark" aria-hidden="true">✳</span>
     </div>
-
-    <div class="card">
-      <h3 id="s3">ملفات الأعمال</h3>
-      <p id="d3">إعداد ملفات Word وExcel وعروض الأسعار والفواتير.</p>
-      <div class="price" id="p3">حسب الطلب</div>
+  </section>
+  <div class="ticker wrap"><span id="tickerLabel">LE DIGITAL, POUR TOUS LES AMBITIEUX.</span><strong id="audience1">Commerçants</strong><strong id="audience2">Entrepreneurs</strong><strong id="audience3">PME & entreprises</strong><strong id="audience4">Cliniques & institutions</strong></div>
+  <section class="services wrap" id="services" aria-labelledby="servicesTitle">
+    <div class="section-head">
+      <div><div class="eyebrow"><span aria-hidden="true">01 /</span><span id="servicesLabel">Nos expertises</span></div><h2 id="servicesTitle">Tout ce qu’il faut pour<br>passer au niveau supérieur.</h2></div>
+      <p id="servicesIntro">Une idée précise ou une page blanche ? Nous avons la solution pour donner vie à votre projet.</p>
     </div>
-
-    <div class="card">
-      <h3 id="s4">الصيانة والتحديث</h3>
-      <p id="d4">متابعة موقعك وتحديث المعلومات والخدمات عند الحاجة.</p>
-      <div class="price" id="p4">ابتداءً من 3,000 دج شهرياً</div>
+    <div class="cards">
+      <article class="card featured">
+        <div class="card-top"><span class="icon-box"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="15" rx="2"/><path d="M3 9h18M7 6.5h.01M10 6.5h.01m-1 6-2 2 2 2m6-4 2 2-2 2"/></svg></span><span class="tag" id="popularTag">L’essentiel digital</span></div>
+        <h3 id="s1">Création de sites web</h3><p id="d1">Une vitrine qui vous ressemble. Des sites rapides, élégants et adaptés à tous les écrans.</p>
+        <div class="card-bottom"><span class="price" id="p1">À partir de 8 000 DA</span><a class="card-link wa" href="https://wa.me/213771626233" data-service="s1" aria-labelledby="s1" target="_blank" rel="noopener noreferrer"><span class="arrow" aria-hidden="true">↗</span></a></div>
+      </article>
+      <article class="card">
+        <div class="card-top"><span class="icon-box"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h3v5H8zm7 0h1m-1 4h1"/></svg></span></div>
+        <h3 id="s2">Catalogues digitaux</h3><p id="d2">Vos produits à portée de clic. Un catalogue clair et attractif, facile à partager avec vos clients.</p>
+        <div class="card-bottom"><span class="price" id="p2">À partir de 5 000 DA</span><a class="card-link wa" href="https://wa.me/213771626233" data-service="s2" aria-labelledby="s2" target="_blank" rel="noopener noreferrer"><span class="arrow" aria-hidden="true">↗</span></a></div>
+      </article>
+      <article class="card">
+        <div class="card-top"><span class="icon-box"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zm0 0v6h6M8 13h8m-8 4h5"/></svg></span></div>
+        <h3 id="s3">Documents professionnels</h3><p id="d3">Les bons outils pour votre quotidien : devis, factures, présentations et tableaux de gestion.</p>
+        <div class="card-bottom"><span class="price" id="p3">Sur devis</span><a class="card-link wa" href="https://wa.me/213771626233" data-service="s3" aria-labelledby="s3" target="_blank" rel="noopener noreferrer"><span class="arrow" aria-hidden="true">↗</span></a></div>
+      </article>
+      <article class="card">
+        <div class="card-top"><span class="icon-box"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 8a8 8 0 0 0-14-2L3 9m0-5v5h5M4 16a8 8 0 0 0 14 2l3-3m0 5v-5h-5"/></svg></span></div>
+        <h3 id="s4">Maintenance & suivi</h3><p id="d4">Vous avancez, votre site aussi. Mises à jour et suivi pour garder votre présence digitale au meilleur niveau.</p>
+        <div class="card-bottom"><span class="price" id="p4">À partir de 3 000 DA / mois</span><a class="card-link wa" href="https://wa.me/213771626233" data-service="s4" aria-labelledby="s4" target="_blank" rel="noopener noreferrer"><span class="arrow" aria-hidden="true">↗</span></a></div>
+      </article>
+      <article class="card">
+        <div class="card-top"><span class="icon-box"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 5h4m-3 14h2m-3-9-2 2 2 2m4-4 2 2-2 2"/></svg></span></div>
+        <h3 id="s5">Applications mobiles</h3><p id="d5">Votre idée dans la poche de vos clients. Des applications Android et iPhone pensées pour votre activité.</p>
+        <div class="card-bottom"><span class="price" id="p5">Sur devis</span><a class="card-link wa" href="https://wa.me/213771626233" data-service="s5" aria-labelledby="s5" target="_blank" rel="noopener noreferrer"><span class="arrow" aria-hidden="true">↗</span></a></div>
+      </article>
+      <article class="card">
+        <div class="card-top"><span class="icon-box"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="3" width="8" height="6" rx="1"/><rect x="2" y="16" width="7" height="5" rx="1"/><rect x="15" y="16" width="7" height="5" rx="1"/><path d="M12 9v4m-7 3v-3h14v3"/></svg></span></div>
+        <h3 id="s6">Plateformes sur mesure</h3><p id="d6">Simplifiez votre organisation. Des outils de gestion adaptés aux entreprises, cliniques et institutions.</p>
+        <div class="card-bottom"><span class="price" id="p6">Selon votre projet</span><a class="card-link wa" href="https://wa.me/213771626233" data-service="s6" aria-labelledby="s6" target="_blank" rel="noopener noreferrer"><span class="arrow" aria-hidden="true">↗</span></a></div>
+      </article>
     </div>
-
-    <div class="card">
-      <h3 id="s5">إنشاء التطبيقات</h3>
-      <p id="d5">تطوير تطبيقات الهاتف Android وiPhone حسب احتياجات مشروعك.</p>
-      <div class="price" id="p5">حسب الطلب</div>
+  </section>
+  <section class="process wrap" id="approach" aria-labelledby="approachTitle">
+    <div class="section-head"><div><div class="eyebrow"><span aria-hidden="true">02 /</span><span id="approachLabel">Simple, du début à la fin</span></div><h2 id="approachTitle">Votre projet. Notre savoir-faire.<br>Un vrai travail d’équipe.</h2></div><p id="approachIntro">Pas de jargon, pas de complexité inutile. Juste une collaboration claire et un objectif commun.</p></div>
+    <div class="steps">
+      <article class="step"><span class="step-number">01 —</span><h3 id="step1Title">On vous écoute</h3><p id="step1Text">Nous échangeons sur votre activité, vos envies et votre budget pour comprendre l’essentiel.</p></article>
+      <article class="step"><span class="step-number">02 —</span><h3 id="step2Title">On donne forme à vos idées</h3><p id="step2Text">Nous concevons une solution sur mesure, avec vous et vos retours à chaque étape.</p></article>
+      <article class="step"><span class="step-number">03 —</span><h3 id="step3Title">On vous accompagne</h3><p id="step3Text">De la mise en ligne aux évolutions, nous restons à vos côtés pour la suite de l’aventure.</p></article>
     </div>
-
-    <div class="card">
-      <h3 id="s6">منصات المستشفيات والشركات</h3>
-      <p id="d6">إنشاء منصات رقمية لإدارة المؤسسات والمستشفيات والعيادات والشركات حسب طبيعة نشاطها.</p>
-      <div class="price" id="p6">حسب حجم المشروع</div>
-    </div>
-
-
-
-
-
-  </div>
-</section>
-
-<section class="contact">
-  <h2 id="contactTitle">هل تريد تطوير نشاطك التجاري؟</h2>
-  <p id="contactText">اتصل بنا الآن لمناقشة مشروعك والحصول على عرض مناسب.</p>
-  <a class="btn wa" href="#" target="_blank" rel="noopener noreferrer" id="contactBtn">راسلنا عبر WhatsApp</a>
-
-
-
-</section>
-
-<footer>
-  © 2026 MIC Digital Services
+  </section>
+  <section class="contact wrap" id="contact" aria-labelledby="contactTitle">
+    <div><div class="eyebrow"><span class="dot" aria-hidden="true"></span><span id="contactLabel">Et si on construisait la suite ?</span></div><h2 id="contactTitle">Les belles idées méritent<br>de prendre vie.</h2><p id="contactText">Parlez-nous de la vôtre. Le premier échange est sans engagement.</p></div>
+    <div class="contact-side"><a class="button lime wa" href="https://wa.me/213771626233" target="_blank" rel="noopener noreferrer"><span id="contactBtn">Discutons sur WhatsApp</span><span class="arrow" aria-hidden="true">↗</span></a><small id="contactNote">Une vraie conversation, avec de vraies personnes.</small></div>
+  </section>
+</main>
+<footer class="footer wrap">
+  <a class="brand" href="#" aria-label="MIC Digital Services"><span class="brand-mark" aria-hidden="true">m.</span><span class="brand-name">mic.<small>Digital Services</small></span></a>
+  <span class="footer-copy" id="footerCopy">© 2026 MIC Digital Services. Pensé en Algérie, pour vos ambitions.</span>
+  <a href="/admin/login"><span id="adminLink">Espace administrateur</span><span aria-hidden="true">↗</span></a>
 </footer>
-
 <script src="/site.js" defer></script>
 </body>
 </html>
