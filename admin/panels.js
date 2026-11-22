@@ -13,6 +13,11 @@
         return;
       }
 
+      if (id === "agent" && typeof window.showAgentPanel === "function") {
+        window.showAgentPanel(button);
+        return;
+      }
+
       if (typeof window.showPanel === "function") {
         window.showPanel(id, button);
       }

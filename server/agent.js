@@ -224,6 +224,7 @@ async function analyzeProject() {
 module.exports = {
   listFiles,
   readFile,
+  redactSecrets,
   analyzeFile,
   analyzeProject
 };

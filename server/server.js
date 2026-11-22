@@ -10,6 +10,7 @@ const bcrypt = require('bcryptjs');
 const db = require('../database/db');
 const ollama = require('./ollama');
 const agent = require('./agent');
+const piAgent = require('./pi-agent');
 
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
   throw new Error('SESSION_SECRET is missing or too short in .env');
@@ -350,6 +351,13 @@ const agentLimiter = rateLimit({
   legacyHeaders: false
 });
 
+const piLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: process.env.NODE_ENV === 'test' ? 1000 : 5,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false
+});
+
 app.get('/api/agent/files', requireAdmin, async (req, res) => {
   try {
     res.json({ ok: true, files: await agent.listFiles() });
@@ -439,6 +447,50 @@ app.post('/api/agent/audit', requireAdmin, agentLimiter, async (req, res) => {
     res.status(500).json({ ok: false, error: 'Project audit failed' });
   }
 });
+// Protected pi agent runs (read-only, no tools)
+app.get('/api/agent/runs', requireAdmin, (req, res) => {
+  if (!piAgent.isEnabled()) {
+    return res.status(404).json({ error: 'Agent is disabled.' });
+  }
+
+  res.json({ ok: true, runs: piAgent.listRuns(20) });
+});
+
+app.post('/api/agent/runs', requireAdmin, piLimiter, async (req, res) => {
+  if (!piAgent.isEnabled()) {
+    return res.status(404).json({ error: 'Agent is disabled.' });
+  }
+
+  try {
+    const run = await piAgent.startRun(req.body && req.body.prompt);
+    res.status(202).json({ ok: true, run });
+  } catch (error) {
+    const status = error.status || 500;
+    if (status >= 500) {
+      console.error('Agent start error:', error.message);
+    }
+    res.status(status).json({ error: error.message });
+  }
+});
+
+app.get('/api/agent/runs/:id', requireAdmin, (req, res) => {
+  if (!piAgent.isEnabled()) {
+    return res.status(404).json({ error: 'Agent is disabled.' });
+  }
+
+  const id = Number(req.params.id);
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return res.status(400).json({ error: 'Invalid run ID' });
+  }
+
+  const run = piAgent.getRun(id);
+  if (!run) {
+    return res.status(404).json({ error: 'Run not found' });
+  }
+
+  res.json({ ok: true, run });
+});
+
 // Unknown routes
 app.use((req, res) => {
   res.status(404).json({ error: 'Not found' });

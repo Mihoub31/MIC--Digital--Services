@@ -57,5 +57,20 @@ db.exec(`
     report TEXT NOT NULL,
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
+
+  CREATE TABLE IF NOT EXISTS agent_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    mode TEXT NOT NULL DEFAULT 'readonly',
+    model TEXT NOT NULL DEFAULT '',
+    prompt TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'running',
+    exit_code INTEGER,
+    duration_ms INTEGER,
+    output TEXT NOT NULL DEFAULT '',
+    error TEXT NOT NULL DEFAULT '',
+    sandbox_path TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    finished_at TEXT
+  );
 `);
 module.exports = db;
