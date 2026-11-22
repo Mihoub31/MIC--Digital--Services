@@ -67,6 +67,7 @@ label{font-size:14px;font-weight:bold}
     <button type="button" data-panel="projects">المشاريع</button>
     <button type="button" data-panel="ai">المساعد الذكي</button>
     <button type="button" data-panel="audit">تدقيق المشروع</button>
+    <button type="button" data-panel="agent">وكيل pi</button>
   </nav>
 </aside>
 <main class="main">
@@ -167,11 +168,32 @@ label{font-size:14px;font-weight:bold}
     <div id="auditHistory">جارٍ تحميل السجل...</div>
   </div>
 </section>
+<section id="agent" class="panel">
+  <div class="box">
+    <h3>وكيل pi — تحليل محلي للقراءة فقط</h3>
+    <p>يحلل وكيل pi نسخة منقحة من الملفات المسموح بها فقط، دون تنفيذ أدوات أو تعديل أي ملف.</p>
+    <form id="agentForm" class="ai-form">
+      <textarea id="agentPrompt" maxlength="4000" rows="4" required placeholder="اطلب تحليلاً أو مراجعة للكود..."></textarea>
+      <button id="agentRun" class="btn" type="submit">تشغيل التحليل</button>
+      <span id="agentStatus" class="ai-status offline">جاهز</span>
+    </form>
+    <p class="subtitle">النتيجة اقتراحات أولية تحتاج مراجعة بشرية، ولا تُعدّ إثباتاً لوجود ثغرات.</p>
+  </div>
+  <div class="box">
+    <h3>النتيجة</h3>
+    <pre id="agentOutput" class="audit-report">لا توجد نتيجة بعد.</pre>
+  </div>
+  <div class="box">
+    <h3>آخر 20 عملية</h3>
+    <div id="agentHistory">جارٍ تحميل السجل...</div>
+  </div>
+</section>
 </main>
 </div>
 <script src="/admin/dashboard.js" defer></script>
 <script src="/admin/ai.js" defer></script>
 <script src="/admin/audit.js" defer></script>
+<script src="/admin/agent.js" defer></script>
 <script src="/admin/panels.js" defer></script>
 </body>
 </html>
