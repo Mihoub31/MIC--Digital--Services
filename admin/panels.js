@@ -18,6 +18,11 @@
         return;
       }
 
+      if (id === "graph" && typeof window.showGraphPanel === "function") {
+        window.showGraphPanel(button);
+        return;
+      }
+
       if (typeof window.showPanel === "function") {
         window.showPanel(id, button);
       }

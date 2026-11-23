@@ -72,5 +72,16 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     finished_at TEXT
   );
+
+  CREATE TABLE IF NOT EXISTS graph_builds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    status TEXT NOT NULL DEFAULT 'running',
+    report TEXT NOT NULL DEFAULT '',
+    html_path TEXT NOT NULL DEFAULT '',
+    duration_ms INTEGER,
+    error TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    finished_at TEXT
+  );
 `);
 module.exports = db;

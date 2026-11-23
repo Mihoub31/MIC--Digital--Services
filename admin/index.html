@@ -68,6 +68,7 @@ label{font-size:14px;font-weight:bold}
     <button type="button" data-panel="ai">المساعد الذكي</button>
     <button type="button" data-panel="audit">تدقيق المشروع</button>
     <button type="button" data-panel="agent">وكيل pi</button>
+    <button type="button" data-panel="graph">خريطة الكود</button>
   </nav>
 </aside>
 <main class="main">
@@ -188,12 +189,28 @@ label{font-size:14px;font-weight:bold}
     <div id="agentHistory">جارٍ تحميل السجل...</div>
   </div>
 </section>
+<section id="graph" class="panel">
+  <div class="box">
+    <h3>خريطة الكود — تحليل محلي</h3>
+    <p>يبني رسم بياني للكود عبر تحليل AST محلي، دون ذكاء اصطناعي ولا اتصال خارجي.</p>
+    <button id="graphBuild" class="btn" type="button">بناء الخريطة</button>
+    <span id="graphStatus" class="ai-status offline">جاهز</span>
+    <p class="subtitle">يعمل على نسخة مؤقتة من آخر التزام، ولا يعدّل أي ملف في المشروع.</p>
+  </div>
+  <div class="box">
+    <h3>ملخص التقرير</h3>
+    <p id="graphMeta">لا يوجد بناء بعد.</p>
+    <pre id="graphReport" class="audit-report">لا يوجد تقرير بعد.</pre>
+    <p><a id="graphView" href="/api/agent/graph/view" target="_blank" rel="noopener" hidden>فتح الخريطة التفاعلية</a></p>
+  </div>
+</section>
 </main>
 </div>
 <script src="/admin/dashboard.js" defer></script>
 <script src="/admin/ai.js" defer></script>
 <script src="/admin/audit.js" defer></script>
 <script src="/admin/agent.js" defer></script>
+<script src="/admin/graph.js" defer></script>
 <script src="/admin/panels.js" defer></script>
 </body>
 </html>

@@ -11,6 +11,7 @@ const db = require('../database/db');
 const ollama = require('./ollama');
 const agent = require('./agent');
 const piAgent = require('./pi-agent');
+const graphAgent = require('./graph-agent');
 
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
   throw new Error('SESSION_SECRET is missing or too short in .env');
@@ -18,7 +19,7 @@ if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || (process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1');
 const adminDir = path.join(__dirname, '..', 'admin');
 
 if (process.env.NODE_ENV === 'production') {
@@ -358,6 +359,13 @@ const piLimiter = rateLimit({
   legacyHeaders: false
 });
 
+const graphLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: process.env.NODE_ENV === 'test' ? 1000 : 1,
+  standardHeaders: 'draft-8',
+  legacyHeaders: false
+});
+
 app.get('/api/agent/files', requireAdmin, async (req, res) => {
   try {
     res.json({ ok: true, files: await agent.listFiles() });
@@ -489,6 +497,49 @@ app.get('/api/agent/runs/:id', requireAdmin, (req, res) => {
   }
 
   res.json({ ok: true, run });
+});
+
+// graphify is a local tool: install status is checked on each call
+app.post('/api/agent/graph/build', requireAdmin, graphLimiter, (req, res) => {
+  if (!graphAgent.isAvailable()) {
+    return res.status(404).json({ error: 'Graphify is not installed.' });
+  }
+
+  try {
+    const build = graphAgent.startBuild();
+    res.status(202).json({ ok: true, build });
+  } catch (error) {
+    const status = error.status || 500;
+    if (status >= 500) {
+      console.error('Graph build error:', error.message);
+    }
+    res.status(status).json({ error: error.message });
+  }
+});
+
+app.get('/api/agent/graph/latest', requireAdmin, (req, res) => {
+  if (!graphAgent.isAvailable()) {
+    return res.status(404).json({ error: 'Graphify is not installed.' });
+  }
+
+  res.json({ ok: true, build: graphAgent.getLatest() || null });
+});
+
+app.get('/api/agent/graph/view', requireAdmin, (req, res) => {
+  if (!graphAgent.isAvailable()) {
+    return res.status(404).json({ error: 'Graphify is not installed.' });
+  }
+
+  const file = graphAgent.getViewerFile();
+  if (!file) {
+    return res.status(404).json({ error: 'No local viewer is available.' });
+  }
+
+  res.set(
+    'Content-Security-Policy',
+    "default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:"
+  );
+  res.sendFile(file);
 });
 
 // Unknown routes
